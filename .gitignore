@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# IDEs / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Laboratorio: datos generados
+# (descomenta si prefieres NO subir las grabaciones o el modelo)
+# banco/
+# *.wav
+# modelo.npz
