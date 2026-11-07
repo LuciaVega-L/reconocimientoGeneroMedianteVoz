@@ -13,7 +13,7 @@ from scipy.io import wavfile
 from scipy.signal import resample_poly
 
 try:
-    from filtros_banco import FS, disenar_banco, caracteristicas
+    from filtrosBanco import FS, disenar_banco, caracteristicas
 except ModuleNotFoundError:
     from filtrosBanco import FS, disenar_banco, caracteristicas
 
