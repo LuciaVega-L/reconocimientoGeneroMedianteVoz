@@ -71,5 +71,8 @@ for p in np.unique(personas):
 print(f"Error estimado: {100*errores/len(y):.1f} %  (meta: <= 5 %)")
 
 mu, sd, cent = ajustar(X, y)
-np.savez("modelo.npz", mu=mu, sd=sd, cent=cent)
+Z = (X - mu) / sd
+dist_ref = float(np.median([np.linalg.norm(Z[i] - cent[y[i]]) for i in range(len(y))]))
+np.savez("modelo.npz", mu=mu, sd=sd, cent=cent, dist_ref=dist_ref)
+print(f"Distancia tipica de un audio del banco a su centroide: {dist_ref:.2f}")
 print("Modelo guardado en modelo.npz")
