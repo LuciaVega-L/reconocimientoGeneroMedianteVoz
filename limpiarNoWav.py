@@ -1,11 +1,4 @@
-"""
-Borra de entrada/hombre y entrada/mujer los archivos que NO son .wav,
-pero SOLO si ya existe su version .wav (mismo nombre). Pide confirmacion.
 
-Uso:
-    python limpiar_no_wav.py
-    python limpiar_no_wav.py carpeta1 carpeta2
-"""
 import os, sys
 
 carpetas = sys.argv[1:] or [os.path.join("entrada", "hombre"), os.path.join("entrada", "mujer")]

@@ -1,11 +1,4 @@
-"""
-Laboratorio 2 - Reconocimiento de genero por banco de filtros.
-Todas las formulas siguen las notas de clase (Prof. Fabian Velasquez):
-  - Filtro FIR pasabanda ideal (metodo de la transformada de Fourier)
-  - Ventana Hamming / Hanning
-  - y(n) = sum_k h(k) x(n-k)
-  - Energia por subbanda: promedio y desviacion de las energias
-"""
+
 from math import gcd
 import numpy as np
 import soundfile as sf

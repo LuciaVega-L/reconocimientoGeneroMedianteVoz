@@ -1,12 +1,4 @@
-"""
-Convierte a .wav (mono, 8000 Hz) todos los audios que NO sean .wav:
-.opus, .mp3, .m4a, .ogg, .aac, .flac, .amr, .wma, y archivos SIN extension.
-Los .wav existentes no se tocan. Los originales se conservan.
 
-Uso:
-    python convertir_a_wav.py                      (usa entrada/hombre y entrada/mujer)
-    python convertir_a_wav.py carpeta1 carpeta2    (carpetas que tu elijas)
-"""
 import os, sys, subprocess
 import imageio_ffmpeg
 

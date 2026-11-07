@@ -1,10 +1,4 @@
-"""Lee los audios de entrada/hombre y entrada/mujer, extrae caracteristicas,
-entrena y estima el error.
-- Si un audio no esta a 8000 Hz o es estereo, cargar_audio() lo corrige.
-- Los pasos opcionales (normalizar, descartar silencio) se activan en filtros_banco.py.
-Clasificador provisional: distancia al centroide de cada clase (z-score).
-Validacion: dejar una persona fuera (leave-one-person-out).
-"""
+
 import glob, os
 import numpy as np
 

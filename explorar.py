@@ -1,8 +1,4 @@
-"""
-Prueba varias configuraciones de subbandas y reporta el error (dejando 1 audio fuera).
-No modifica nada: solo imprime una tabla para escoger la mejor configuracion.
-Uso:  python explorar.py
-"""
+
 import glob, os
 from math import gcd
 import numpy as np
