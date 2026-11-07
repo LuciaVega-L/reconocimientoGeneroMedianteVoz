@@ -1,20 +1,51 @@
-
+"""Lee los audios de entrada/hombre y entrada/mujer, extrae caracteristicas,
+entrena y estima el error.
+- El volumen se normaliza dentro de caracteristicas() (quita la media y divide
+  por el pico), asi que no hace falta ajustarlo antes.
+- Si un audio no esta a 8000 Hz o es estereo, se corrige aqui mismo.
+Clasificador provisional: distancia al centroide de cada clase (z-score).
+Validacion: dejar una persona fuera (leave-one-person-out).
+"""
 import glob, os
+from math import gcd
 import numpy as np
 from scipy.io import wavfile
-from filtrosBanco import FS, disenar_banco, caracteristicas
+from scipy.signal import resample_poly
 
+try:
+    from filtros_banco import FS, disenar_banco, caracteristicas
+except ModuleNotFoundError:
+    from filtrosBanco import FS, disenar_banco, caracteristicas
+
+CARPETA = "entrada"
 CLASES = ["hombre", "mujer"]
 banco = disenar_banco()
 
+
+def leer_audio(ruta):
+    fs, x = wavfile.read(ruta)
+    x = x.astype(float)
+    if x.ndim > 1:                       # estereo -> mono
+        x = x.mean(axis=1)
+    if fs != FS:                         # remuestrear a FS
+        g = gcd(FS, fs)
+        x = resample_poly(x, FS // g, fs // g)
+    return x
+
+
 X, y, personas = [], [], []
 for c, clase in enumerate(CLASES):
-    for ruta in sorted(glob.glob(f"banco/{clase}/*.wav")):
-        fs, x = wavfile.read(ruta)
-        assert fs == FS, f"{ruta}: fs={fs}, se esperaba {FS}"
-        X.append(caracteristicas(x.astype(float), banco, fs))
+    rutas = sorted(glob.glob(os.path.join(CARPETA, clase, "*.wav")))
+    if not rutas:
+        print(f"[!] No hay .wav en {os.path.join(CARPETA, clase)}")
+    for ruta in rutas:
+        try:
+            X.append(caracteristicas(leer_audio(ruta), banco, FS))
+        except Exception as e:
+            print(f"[X] Se omite {ruta}: {e}")
+            continue
         y.append(c)
-        personas.append(clase + "_" + os.path.basename(ruta).rsplit("_", 1)[0])
+        personas.append(clase + "_" + os.path.basename(ruta))   # 1 archivo = 1 persona
 X, y, personas = np.array(X), np.array(y), np.array(personas)
 print(f"{len(y)} grabaciones | hombre={np.sum(y==0)} mujer={np.sum(y==1)}")
 
