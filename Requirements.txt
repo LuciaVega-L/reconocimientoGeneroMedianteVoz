@@ -3,3 +3,4 @@ scipy
 sounddevice
 soundfile
 imageio-ffmpeg
+matplotlib

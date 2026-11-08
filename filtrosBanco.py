@@ -1,4 +1,3 @@
-
 from math import gcd
 import numpy as np
 import soundfile as sf
@@ -8,18 +7,17 @@ from scipy.signal import resample_poly
 FS = 8000                 # frecuencia de muestreo (Hz)
 N_ORDEN = 255             # orden del FIR (impar, como en las notas)
 VENTANA = "hamming"       # "hamming" o "hanning"
-BANDAS = [                # entre 2 y 5 subbandas (fc1, fc2) en Hz
-    (85, 180),
-    (180, 255),
-    (255, 1000),
-    (1000, 3800),
+BANDAS = [                # 3 subbandas de IGUAL ancho (700 Hz c/u), fc1-fc2 en Hz
+    (100, 800),
+    (800, 1500),
+    (1500, 2200),
 ]
 DUR_TRAMA = 0.02          # 20 ms por trama para calcular energias
 DUR_GRABACION = 2.0       # segundos de captura del comando de voz
 
-# Pasos que NO estan en el PDF (apagados = version "solo PDF"):
-NORMALIZAR_AMPLITUD = False
-DESCARTAR_SILENCIO = False    # ignorar tramas con poca energia
+# Pasos que NO estan en el PDF (ponerlos en False = version "solo PDF"):
+NORMALIZAR_AMPLITUD = True
+DESCARTAR_SILENCIO = True     # ignorar tramas con poca energia
 UMBRAL_SILENCIO = 0.05        # fraccion de la energia maxima (si DESCARTAR_SILENCIO)
 # ---------------------------------------------------------
 
@@ -58,10 +56,25 @@ def ventana(N, tipo="hamming"):
     raise ValueError("Ventana no soportada")
 
 
+def verificar_bandas(bandas=BANDAS, fs=FS, N=N_ORDEN, tol=1e-9):
+    """Comprueba que (1) todas las subbandas tienen el mismo ancho BW = fc2 - fc1,
+    (2) no se solapan, (3) fc2 < fs/2 (Nyquist) y (4) BW es mayor que el ancho de
+    transicion de la ventana Hamming (~3.3 fs/N), para que el filtro realmente
+    aisle la banda. Devuelve la lista de anchos."""
+    anchos = [f2 - f1 for f1, f2 in bandas]
+    assert max(anchos) - min(anchos) <= tol, f"Anchos distintos: {anchos}"
+    assert all(bandas[i][1] <= bandas[i + 1][0] for i in range(len(bandas) - 1)), "Subbandas solapadas"
+    assert bandas[-1][1] < fs / 2, "fc2 debe ser menor que Nyquist (fs/2)"
+    trans = 3.3 * fs / N
+    assert min(anchos) > trans, f"BW={min(anchos)} Hz <= transicion de la ventana ({trans:.0f} Hz)"
+    return anchos
+
+
 def disenar_banco(fs=FS, N=N_ORDEN, bandas=BANDAS, tipo=VENTANA):
     """hd(n) = h(n) w(n) para cada subbanda."""
     assert 2 <= len(bandas) <= 5, "El enunciado pide entre 2 y 5 subbandas"
     assert N % 2 == 1, "N debe ser impar"
+    verificar_bandas(bandas, fs, N)
     return [h_pasabanda_ideal(f1, f2, fs, N) * ventana(N, tipo) for f1, f2 in bandas]
 
 
