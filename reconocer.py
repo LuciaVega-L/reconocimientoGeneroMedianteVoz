@@ -1,6 +1,4 @@
-"""Captura en tiempo real (microfono) y reconoce el genero.
-Requiere haber corrido antes:  python entrenar.py  (genera modelo.npz)
-"""
+
 from math import gcd
 import numpy as np
 import sounddevice as sd
