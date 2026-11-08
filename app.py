@@ -112,21 +112,19 @@ class VentanaGraficas(tk.Toplevel):
         self.canvas.get_tk_widget().pack(fill="both", expand=True, padx=8, pady=8)
 
     def actualizar(self, x, clase, e_prom):
-        self.ultimo = (x, clase, e_prom)
-        self.btn_graf.state(["!disabled"])
-        self.abrir_graficas()
-
-    def abrir_graficas(self):
-        if self.ultimo is None:
-            return
-        if self.ventana is None:
-            self.ventana = VentanaGraficas(self.root, self._ventana_cerrada)
-        self.ventana.actualizar(*self.ultimo)
-
-    def _ventana_cerrada(self):
-        self.ventana = None
         self.deiconify()
         self.lift()
+        self.update_idletasks()                 # la ventana ya tiene tamano real antes de dibujar
+        try:
+            dibujar(self.fig, x, clase, e_prom)
+        except Exception:
+            import traceback
+            detalle = traceback.format_exc()
+            print(detalle)                      # tambien en la consola
+            self.fig.clear()
+            self.fig.text(0.03, 0.97, "No se pudieron dibujar las gráficas:\n\n" + detalle,
+                          va="top", ha="left", fontsize=9, color="#b91c1c", family="monospace")
+        self.canvas.draw_idle()
 
     def _cerrar(self):
         self._alcerrar()
