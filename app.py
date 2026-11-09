@@ -1,7 +1,3 @@
-"""Interfaz (tema claro) para reconocer el genero por voz.
-Requiere haber corrido antes:  python entrenar.py  (genera modelo.npz)
-Uso:  python app.py
-"""
 import threading
 from math import gcd
 
@@ -18,9 +14,8 @@ from filtrosBanco import (FS, DUR_GRABACION, BANDAS, disenar_banco, caracteristi
                           cargar_audio)
 
 CLASES = ["hombre", "mujer"]
-DESCARTE = 0.3          # s iniciales que se descartan al grabar (ruido de arranque del mic)
+DESCARTE = 0.3
 
-# ---- Paleta (tema claro) ----
 PAGE, CARD, BORDE = "#f5f7fb", "#ffffff", "#e5e7eb"
 FG, FG_SUAVE = "#1f2933", "#6b7280"
 ACENTO, ACENTO_OSC = "#2563eb", "#1d4ed8"
@@ -33,7 +28,6 @@ BANCO = disenar_banco()
 
 
 def clasificar(x):
-    """x: senal a FS Hz. Devuelve (indice_clase, distancias_a_centroides, energias_promedio)."""
     f = caracteristicas(x, BANCO, FS)
     z = (f - modelo["mu"]) / modelo["sd"]
     d = np.linalg.norm(modelo["cent"] - z, axis=1)
@@ -57,7 +51,6 @@ def _estilo_ejes(fig, axes):
 
 
 def dibujar(fig, x, clase, e_prom):
-    """Grafica 1: senal en el tiempo. Grafica 2: energia promedio por subbanda."""
     fig.clear()
     color = COL_H if clase == 0 else COL_M
 
@@ -90,8 +83,6 @@ def dibujar(fig, x, clase, e_prom):
 
 
 class VentanaGraficas(tk.Toplevel):
-    """Ventana aparte, grande, con barra de herramientas (zoom, mover, guardar/imprimir)."""
-
     def __init__(self, master, alcerrar):
         super().__init__(master)
         self.title("Gráficas de la señal")
@@ -107,20 +98,20 @@ class VentanaGraficas(tk.Toplevel):
             barra = NavigationToolbar2Tk(self.canvas, self, pack_toolbar=False)
             barra.update()
             barra.pack(side="bottom", fill="x")
-        except TypeError:                       # matplotlib antiguo (se empaqueta solo)
+        except TypeError:
             NavigationToolbar2Tk(self.canvas, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True, padx=8, pady=8)
 
     def actualizar(self, x, clase, e_prom):
         self.deiconify()
         self.lift()
-        self.update_idletasks()                 # la ventana ya tiene tamano real antes de dibujar
+        self.update_idletasks()
         try:
             dibujar(self.fig, x, clase, e_prom)
         except Exception:
             import traceback
             detalle = traceback.format_exc()
-            print(detalle)                      # tambien en la consola
+            print(detalle)
             self.fig.clear()
             self.fig.text(0.03, 0.97, "No se pudieron dibujar las gráficas:\n\n" + detalle,
                           va="top", ha="left", fontsize=9, color="#b91c1c", family="monospace")
@@ -142,7 +133,6 @@ class App:
         self.ultimo = None
         self._estilos()
 
-        # ---- Encabezado ----
         enc = tk.Frame(root, bg=PAGE)
         enc.pack(fill="x", padx=24, pady=(20, 4))
         tk.Label(enc, text="Reconocimiento de género por voz", bg=PAGE, fg=FG,
@@ -150,7 +140,6 @@ class App:
         tk.Label(enc, text=f"Análisis de banco de filtros · {len(BANDAS)} subbandas · fs = {FS} Hz",
                  bg=PAGE, fg=FG_SUAVE, font=(FUENTE, 10)).pack(anchor="w")
 
-        # ---- Botones ----
         barra = tk.Frame(root, bg=PAGE)
         barra.pack(fill="x", padx=24, pady=(14, 10))
         self.btn_grabar = ttk.Button(barra, text=f"●  Grabar ({DUR_GRABACION:.0f} s)",
@@ -162,7 +151,6 @@ class App:
                                    command=self.abrir_graficas, state="disabled")
         self.btn_graf.pack(side="left")
 
-        # ---- Tarjeta de resultado ----
         res = self._tarjeta(root)
         res.pack(fill="x", padx=24, pady=(0, 20))
         interior = tk.Frame(res, bg=CARD)
@@ -171,7 +159,7 @@ class App:
         tk.Label(interior, text="RESULTADO", bg=CARD, fg=FG_SUAVE,
                  font=(FUENTE, 9, "bold")).pack(anchor="w")
         self.badge = tk.Label(interior, text="Sin resultado", bg=TINTE_N, fg=FG_SUAVE,
-                              font=(FUENTE, 26, "bold"), padx=26, pady=8)
+                                font=(FUENTE, 26, "bold"), padx=26, pady=8)
         self.badge.pack(anchor="w", pady=(6, 4))
         self.lbl_info = tk.Label(interior, text="Pulsa «Grabar» y di la palabra seleccionada.",
                                  bg=CARD, fg=FG_SUAVE, font=(FUENTE, 10))
@@ -184,7 +172,6 @@ class App:
         self.v_dif = self._chip(chips, "Diferencia")
         self.v_pico = self._chip(chips, "Nivel pico")
 
-        # Margen de error estimado en el entrenamiento (validacion leave-one-person-out)
         if "error_pct" in modelo.files:
             ep = float(modelo["error_pct"])
             txt = (f"Margen de error estimado del sistema: {ep:.1f} %  "
@@ -195,7 +182,6 @@ class App:
             txt, col = "Margen de error: vuelve a correr entrenar.py para calcularlo.", FG_SUAVE
         tk.Label(interior, text=txt, bg=CARD, fg=col, font=(FUENTE, 10, "bold")).pack(anchor="w", pady=(12, 0))
 
-    # ---------- construccion ----------
     def _estilos(self):
         st = ttk.Style()
         st.theme_use("clam")
@@ -220,7 +206,6 @@ class App:
         valor.pack(anchor="w", padx=6)
         return valor
 
-    # ---------- acciones ----------
     def grabar(self):
         self.btn_grabar.state(["disabled"])
         self.badge.config(text="Escuchando…", bg="#e0e7ff", fg=ACENTO)

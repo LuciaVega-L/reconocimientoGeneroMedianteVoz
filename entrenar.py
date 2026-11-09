@@ -10,21 +10,21 @@ CARPETA = "entrada"
 CLASES = ["hombre", "mujer"]
 banco = disenar_banco()
 
-
 X, y, personas = [], [], []
 for c, clase in enumerate(CLASES):
     rutas = sorted(glob.glob(os.path.join(CARPETA, clase, "*.wav")))
     if not rutas:
         print(f"[!] No hay .wav en {os.path.join(CARPETA, clase)}")
     for ruta in rutas:
-        h = hashlib.md5(open(ruta, "rb").read()).hexdigest()   # solo para agrupar en la validacion
+        h = hashlib.md5(open(ruta, "rb").read()).hexdigest()
         try:
             X.append(caracteristicas(cargar_audio(ruta), banco, FS))
         except Exception as e:
             print(f"[X] Se omite {ruta}: {e}")
             continue
         y.append(c)
-        personas.append(clase + "_" + h)   # archivos con contenido identico se dejan fuera juntos en la validacion
+        personas.append(clase + "_" + h)
+
 X, y, personas = np.array(X), np.array(y), np.array(personas)
 print(f"{len(y)} grabaciones | hombre={np.sum(y==0)} mujer={np.sum(y==1)}")
 
@@ -41,19 +41,20 @@ def predecir(x, mu, sd, cent):
     return int(np.argmin(np.linalg.norm(cent - z, axis=1)))
 
 
-# Validacion leave-one-person-out
+# Validación leave-one-person-out
 errores = 0
 for p in np.unique(personas):
     te = personas == p
     mu, sd, cent = ajustar(X[~te], y[~te])
     errores += sum(predecir(x, mu, sd, cent) != yi for x, yi in zip(X[te], y[te]))
-error_pct = 100 * errores / len(y)
-print(f"Error estimado: {error_pct:.1f} %  ({errores} de {len(y)} audios mal clasificados; meta: <= 5 %)")
+
+error_pct = 100 * errores / len(y) if len(y) > 0 else 0
+print(f"Error estimado: {error_pct:.1f} % ({errores} de {len(y)} audios mal clasificados; meta: <= 5 %)")
 
 mu, sd, cent = ajustar(X, y)
 Z = (X - mu) / sd
 dist_ref = float(np.median([np.linalg.norm(Z[i] - cent[y[i]]) for i in range(len(y))]))
 np.savez("modelo.npz", mu=mu, sd=sd, cent=cent, dist_ref=dist_ref,
          error_pct=error_pct, errores=errores, total=len(y))
-print(f"Distancia tipica de un audio del banco a su centroide: {dist_ref:.2f}")
+print(f"Distancia típica de un audio del banco a su centroide: {dist_ref:.2f}")
 print("Modelo guardado en modelo.npz")
