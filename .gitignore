@@ -18,9 +18,4 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
-# Laboratorio: datos generados
-# (descomenta si prefieres NO subir las grabaciones o el modelo)
-# banco/
-# *.wav
-# modelo.npz
 modelo.npz
