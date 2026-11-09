@@ -14,26 +14,17 @@ BANDAS = [                # 5 subbandas iguales de 700 Hz (PDF pág. 44, 78)
     (2200, 2900),
     (2900, 3600),
 ]
-DUR_TRAMA = 0.02          # Tramas de 20 ms[cite: 44]
-DUR_GRABACION = 2.0       # Duración en segundos[cite: 44, 51]
+DUR_TRAMA = 0.02          # Tramas de 20 ms
+DUR_GRABACION = 2.0       # Duración en segundos
 
 NORMALIZAR_AMPLITUD = True
 DESCARTAR_SILENCIO = True
 UMBRAL_SILENCIO = 0.05
-# -----------------------------------------------------------
-
 
 def omega_c(fc, fs):
-    """Frecuencia digital Omega_c = 2*pi*fc/fs (PDF pág. 16, 29)."""
     return 2 * np.pi * fc / fs
 
-
 def h_pasabanda_ideal(fc1, fc2, fs, N):
-    """
-    Filtro pasabanda ideal (PDF pág. 19, 29):
-    hBP(n) = [sen(Wc2 n) - sen(Wc1 n)] / (pi n),  n != 0
-           = (Wc2 - Wc1) / pi,                  n = 0
-    """
     w1, w2 = omega_c(fc1, fs), omega_c(fc2, fs)
     M = (N - 1) // 2
     n = np.arange(-M, M + 1)
@@ -45,7 +36,7 @@ def h_pasabanda_ideal(fc1, fc2, fs, N):
 
 
 def ventana(N, tipo="hamming"):
-    """Ventana Hamming: w(n) = 0.54 - 0.46 cos(2 pi n/(N-1)) (PDF pág. 17, 29)."""
+    #Ventana Hamming: w(n) = 0.54 - 0.46 cos(2 pi n/(N-1)) 
     n = np.arange(N)
     if tipo == "hamming":
         return 0.54 - 0.46 * np.cos(2 * np.pi * n / (N - 1))
@@ -65,7 +56,7 @@ def verificar_bandas(bandas=BANDAS, fs=FS, N=N_ORDEN, tol=1e-9):
 
 
 def disenar_banco(fs=FS, N=N_ORDEN, bandas=BANDAS, tipo=VENTANA):
-    """hd(n) = hBP(n) * w(n) para cada subbanda (PDF pág. 16, 29)."""
+    #hd(n) = hBP(n) * w(n) 
     assert 2 <= len(bandas) <= 5, "El laboratorio exige entre 2 y 5 subbandas"[cite: 45, 78]
     assert N % 2 == 1, "N debe ser impar"[cite: 62]
     verificar_bandas(bandas, fs, N)
@@ -73,19 +64,18 @@ def disenar_banco(fs=FS, N=N_ORDEN, bandas=BANDAS, tipo=VENTANA):
 
 
 def filtrar(x, hd):
-    """y(n) = sum_k h(k) x(n-k) (Convolución discreta; PDF pág. 7, 30)."""
+    #y(n) = sum_k h(k) x(n-k)
     return np.convolve(x, hd, mode="same")
 
 
 def energias_por_trama(y, fs=FS, dur=DUR_TRAMA):
-    """Energía por trama: E = sum y(n)^2 (PDF pág. 28, 45)."""
+    #Energía por trama: E = sum y(n)^2 
     L = int(dur * fs)
     T = len(y) // L
     if T == 0:
         return np.array([np.sum(y**2)])
     tramas = y[: T * L].reshape(T, L)
     return np.sum(tramas ** 2, axis=1)
-
 
 def cargar_audio(ruta, fs_destino=FS):
     x, fs = sf.read(ruta, dtype="float32", always_2d=True)
@@ -95,12 +85,8 @@ def cargar_audio(ruta, fs_destino=FS):
         x = resample_poly(x, fs_destino // g, fs // g)
     return x
 
-
 def caracteristicas(x, banco, fs=FS, normalizar=None, descartar=None):
-    """
-    Vector de características = [E_prom_1..K, Desv_1..K]
-    (Energía promedio y desviación estándar por subbanda; PDF pág. 46 y Lab 2).
-    """
+
     normalizar = NORMALIZAR_AMPLITUD if normalizar is None else normalizar
     descartar = DESCARTAR_SILENCIO if descartar is None else descartar
 

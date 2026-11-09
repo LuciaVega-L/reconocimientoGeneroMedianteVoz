@@ -1,10 +1,8 @@
 import threading
 from math import gcd
-
 import numpy as np
 import tkinter as tk
 from tkinter import ttk, filedialog
-
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
@@ -12,7 +10,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 
 from filtrosBanco import (FS, DUR_GRABACION, BANDAS, disenar_banco, caracteristicas,
                           cargar_audio)
-
 CLASES = ["hombre", "mujer"]
 DESCARTE = 0.3
 

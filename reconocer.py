@@ -12,9 +12,9 @@ except ModuleNotFoundError:
 try:                      # si el microfono acepta 8000 Hz se graba directo a FS
     sd.check_input_settings(samplerate=FS, channels=1)
     FS_MIC = FS
-except Exception:         # si no, se graba a 44100 Hz y se remuestrea
+except Exception:        
     FS_MIC = 44100
-DESCARTE = 0.3            # s iniciales que se descartan (ruido del ENTER / arranque del mic)
+DESCARTE = 0.3            
 CLASES = ["hombre", "mujer"]
 
 m = np.load("modelo.npz")

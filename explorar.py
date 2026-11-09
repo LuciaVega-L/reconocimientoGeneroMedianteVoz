@@ -1,4 +1,3 @@
-
 import glob, os
 from math import gcd
 import numpy as np
@@ -34,12 +33,11 @@ def leer_audio(ruta):
     return x
 
 
-VENTANA_S = 0.8          # duracion de la ventana alrededor de la palabra (s)
+VENTANA_S = 0.8         
 
 
 def recortar(x, modo):
-    """'completo' = sin recorte. 'ventana' = VENTANA_S segundos centrados en la palabra
-    (trama de mayor energia), asi no importa si la palabra esta al inicio o al final."""
+
     if modo == "completo":
         return x
     W = int(VENTANA_S * FS)
@@ -76,7 +74,6 @@ def error_loo(X, y):
         if p != y[i]:
             mal[y[i]] += 1
     return mal
-
 
 audios, y = [], []
 for c, clase in enumerate(CLASES):
