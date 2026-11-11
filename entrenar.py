@@ -25,7 +25,6 @@ for c, clase in enumerate(CLASES):
 
 X, y, personas = np.array(X), np.array(y), np.array(personas)
 
-
 def ajustar(X, y):
     mu, sd = X.mean(0), X.std(0) + 1e-12
     Z = (X - mu) / sd
@@ -36,7 +35,6 @@ def ajustar(X, y):
 def predecir(x, mu, sd, cent):
     z = (x - mu) / sd
     return int(np.argmin(np.linalg.norm(cent - z, axis=1)))
-
 
 # Validación Leave-One-Person-Out
 errores = 0

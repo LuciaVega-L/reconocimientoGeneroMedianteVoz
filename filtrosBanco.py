@@ -4,10 +4,10 @@ import soundfile as sf
 from scipy.signal import resample_poly
 
 # ---------------- PARAMETROS (Laboratorio 2) ----------------
-FS = 8000                 # Frecuencia de muestreo (Hz)[cite: 65, 78]
-N_ORDEN = 255             # Orden del FIR (impar, N-1=254)[cite: 62, 65]
-VENTANA = "hamming"       # Ventana Hamming (PDF pág. 17, 29)[cite: 63, 75]
-BANDAS = [                # 5 subbandas iguales de 700 Hz (PDF pág. 44, 78)
+FS = 8000                 
+N_ORDEN = 255             
+VENTANA = "hamming"       
+BANDAS = [                
     (100, 800),
     (800, 1500),
     (1500, 2200),
@@ -15,7 +15,7 @@ BANDAS = [                # 5 subbandas iguales de 700 Hz (PDF pág. 44, 78)
     (2900, 3600),
 ]
 DUR_TRAMA = 0.02          # Tramas de 20 ms
-DUR_GRABACION = 2.0       # Duración en segundos
+DUR_GRABACION = 2.0       
 
 NORMALIZAR_AMPLITUD = True
 DESCARTAR_SILENCIO = True
